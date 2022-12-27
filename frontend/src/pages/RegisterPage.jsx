@@ -18,53 +18,85 @@ import {
 } from "@chakra-ui/react";
 import NavBar from "../components/NavBar";
 
+const formStateEmpty = {
+	name: '',
+	email:'',
+	cpf:'',
+	phone:'',
+	birthDate:'',
+	address:'',
+	city:'',
+	status:'Ativo',
+	genre:'Feminino',
+};
+
 function RegisterPage() {
 	const { setDataPatients, dataPatients } = useContext(PatientsContext);
-	const [name, setName] = useState("");
-	const [email, setEmail] = useState("");
-	const [cpf, setCpf] = useState("");
-	const [phone, setPhone] = useState("");
-	const [birthDate, setBirthDate] = useState("");
-	const [adress, setAddress] = useState("");
-	const [city, setCity] = useState("");
-	const [status, setStatus] = useState("Ativo");
-	const [genre, setGenre] = useState("Masculino");
+	const [form, setForm] = useState(
+		formStateEmpty
+	);
+
+	const handleOnChangeGenre = (value) => {
+		setForm({
+			...form,
+			genre: value
+		})
+	}
+
+	const handleOnChange = (event) => {
+		console.log(event)
+		setForm({
+			...form,
+			[event.target.name]: event.target.value
+		})
+	}
+
+	// const [name, setName] = useState("");
+	// const [email, setEmail] = useState("");
+	// const [cpf, setCpf] = useState("");
+	// const [phone, setPhone] = useState("");
+	// const [birthDate, setBirthDate] = useState("");
+	// const [adress, setAddress] = useState("");
+	// const [city, setCity] = useState("");
+	// const [status, setStatus] = useState("Ativo");
+	// const [genre, setGenre] = useState("Masculino");
+
 	const [isValid, setIsValid] = useState(false);
 
 	function validateForm(newPatient) {
-		if (newPatient[0].nome !== "") {
+		if (newPatient.nome !== "") {
 			setIsValid(true);
 		} else {
 			setIsValid(false);
 			console.log("NOME VAZIO");
 		}
 
-		if (newPatient[0].email !== "") {
+		if (newPatient.email !== "") {
 			setIsValid(true);
 		}
 
 		if (
-			newPatient[0].cpf !== "" ||
-			newPatient[0].cpf.length === 11 ||
-			newPatient[0].cpf !== dataPatients.map((patient) => patient.cpf)
+			newPatient.cpf !== "" ||
+			newPatient.cpf.length === 11 ||
+			newPatient.cpf !== dataPatients.map((patient) => patient.cpf)
 		) {
 			setIsValid(true);
 		}
 
-		if (newPatient[0].telefone !== "") {
+		if (newPatient.telefone !== "") {
 			setIsValid(true);
 		}
 
-		if (newPatient[0].dataDeNascimento === "") {
+		if (newPatient.dataDeNascimento === "") {
 			setIsValid(true);
 		}
 
-		if (newPatient[0].cidade === "") {
+		if (newPatient.cidade === "") {
 			setIsValid(true);
 		}
 
 		if (isValid) {
-			const newData = [...dataPatients, ...newPatient];
+			const newData = [...dataPatients, ...[newPatient]];
 			localStorage.setItem("patients", JSON.stringify(newData));
 			setDataPatients(newData);
 		}
@@ -77,33 +109,17 @@ function RegisterPage() {
 				confirmButtonColor: "#2D9CDB",
 			});
 
-			setName("");
-			setEmail("");
-			setCpf("");
-			setPhone("");
-			setBirthDate("");
-			setAddress("");
-			setCity("");
+			setForm(formStateEmpty);
+
 		}
 	}
 
 	function handleSubmitForm() {
-		const newPatient = [
-			{
-				id: dataPatients.length + 1,
-				nome: name,
-				email: email,
-				cpf: cpf,
-				telefone: phone,
-				dataDeNascimento: birthDate,
-				endereco: adress,
-				cidade: city,
-				status: status,
-				genero: genre,
-			},
-		];
 
-		validateForm(newPatient);
+		//id: dataPatients.length + 1,
+
+	
+		validateForm(form);
 	}
 
 	return (
@@ -119,29 +135,25 @@ function RegisterPage() {
 							<Box className="box-form">
 								<FormLabel htmlFor="nome">Nome</FormLabel>
 								<Input
-									id="nome"
+									name="name"
 									variant="filled"
 									placeholder="Informe o nome completo"
-									onChange={(event) => {
-										setName(event.target.value);
-									}}
-									value={name}
+									onChange={handleOnChange}
+									value={form.name}
 								/>
-								{name === " " ? (
+								{/* {name === "" ? (
 									<p>{`* Por favor informe um nome`}</p>
-								) : null}
+								) : null} */}
 							</Box>
 							<Box className="box-form">
 								<FormLabel htmlFor="email">E-mail</FormLabel>
 								<Input
-									id="email"
+									name="email"
 									variant="filled"
 									type="email"
 									placeholder="exemplo@interprocess.com"
-									onChange={(event) => {
-										setEmail(event.target.value);
-									}}
-									value={email}
+									onChange={handleOnChange}
+									value={form.email}
 								/>
 							</Box>
 						</HStack>
@@ -152,26 +164,22 @@ function RegisterPage() {
 									Data de Nascimento
 								</FormLabel>
 								<Input
-									id="nasc"
+									name="nasc"
 									variant="filled"
 									type="date"
-									onChange={(event) => {
-										setBirthDate(event.target.value);
-									}}
-									value={birthDate}
+									onChange={handleOnChange}
+									value={form.birthDate}
 								/>
 							</Box>
 							<Box className="box-form">
 								<FormLabel htmlFor="cpf">CPF</FormLabel>
 								<Input
-									id="cpf"
+									name="cpf"
 									variant="filled"
 									type="number"
 									placeholder="000-000.000-00"
-									onChange={(event) => {
-										setCpf(event.target.value);
-									}}
-									value={cpf}
+									onChange={handleOnChange}
+									value={form.cpf}
 								/>
 							</Box>
 						</HStack>
@@ -182,46 +190,40 @@ function RegisterPage() {
 									Endereço
 								</FormLabel>
 								<Input
-									id="endereco"
+									name="address"
 									variant="filled"
 									placeholder="Rua Brasil 1"
-									onChange={(event) => {
-										setAddress(event.target.value);
-									}}
-									value={adress}
+									onChange={handleOnChange}
+									value={form.address}
 								/>
 							</Box>
 							<Box className="box-form">
-								<FormLabel htmlFor="cidade">Cidade</FormLabel>
+								<FormLabel htmlFor="city">Cidade</FormLabel>
 								<Input
-									id="cidade"
+									name="city"
 									variant="filled"
 									placeholder="Porto Alegre"
-									onChange={(event) => {
-										setCity(event.target.value);
-									}}
-									value={city}
+									onChange={handleOnChange}
+									value={form.city}
 								/>
 							</Box>
 						</HStack>
 
 						<HStack>
 							<Box className="box-form">
-								<FormLabel htmlFor="cel">Celular</FormLabel>
+								<FormLabel htmlFor="phone">Celular</FormLabel>
 								<Input
-									id="cel"
+									name="phone"
 									variant="filled"
 									type="number"
 									placeholder="(51) 99999-9999"
-									onChange={(event) => {
-										setPhone(event.target.value);
-									}}
-									value={phone}
+									onChange={handleOnChange}
+									value={form.phone}
 								/>
 							</Box>
 							<Box className="box-form">
 								<FormLabel>Sexo</FormLabel>
-								<RadioGroup onChange={setGenre} value={genre}>
+								<RadioGroup name="genre" onChange={handleOnChangeGenre} value={form.genre}>
 									<HStack>
 										<Radio value="Masculino">
 											Masculino
@@ -238,10 +240,8 @@ function RegisterPage() {
 								<FormLabel htmlFor="status">Status</FormLabel>
 								<Select
 									variant="flushed"
-									onChange={(event) => {
-										setStatus(event.target.value);
-									}}
-									value={status}
+									onChange={handleOnChange}
+									value={form.status}
 								>
 									<option value="Ativo">Ativo</option>
 									<option value="Inativo">Inativo</option>
@@ -255,17 +255,7 @@ function RegisterPage() {
 								type="button"
 								colorScheme="rgb(18, 7, 88)"
 								isDisabled={
-									name &&
-									email &&
-									birthDate &&
-									cpf &&
-									adress &&
-									city &&
-									phone &&
-									genre &&
-									status
-										? false
-										: true
+									false
 								}
 								onClick={handleSubmitForm}
 							>
