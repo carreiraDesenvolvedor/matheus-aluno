@@ -96,7 +96,12 @@ function RegisterPage() {
 		}
 
 		if (isValid) {
-			const newData = [...dataPatients, ...[newPatient]];
+			const newData = [...dataPatients, ...[
+				{
+					...newPatient,
+					id: dataPatients.length + 1
+				}
+			]];
 			localStorage.setItem("patients", JSON.stringify(newData));
 			setDataPatients(newData);
 		}
@@ -116,9 +121,6 @@ function RegisterPage() {
 
 	function handleSubmitForm() {
 
-		//id: dataPatients.length + 1,
-
-	
 		validateForm(form);
 	}
 
