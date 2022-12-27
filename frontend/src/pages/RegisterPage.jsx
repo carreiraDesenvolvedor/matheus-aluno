@@ -51,16 +51,6 @@ function RegisterPage() {
 		})
 	}
 
-	// const [name, setName] = useState("");
-	// const [email, setEmail] = useState("");
-	// const [cpf, setCpf] = useState("");
-	// const [phone, setPhone] = useState("");
-	// const [birthDate, setBirthDate] = useState("");
-	// const [adress, setAddress] = useState("");
-	// const [city, setCity] = useState("");
-	// const [status, setStatus] = useState("Ativo");
-	// const [genre, setGenre] = useState("Masculino");
-
 	const [isValid, setIsValid] = useState(false);
 
 	function validateForm(newPatient) {
