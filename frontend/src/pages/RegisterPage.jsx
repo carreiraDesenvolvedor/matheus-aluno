@@ -17,6 +17,7 @@ import {
 	Select,
 } from "@chakra-ui/react";
 import NavBar from "../components/NavBar";
+import FormErrorMessage from "../components/Form/ErrorMessage";
 
 const formStateEmpty = {
 	name: '',
@@ -36,6 +37,8 @@ function RegisterPage() {
 		formStateEmpty
 	);
 
+	const [formValidation, setFormValidation] = useState({});
+
 	const handleOnChangeGenre = (value) => {
 		setForm({
 			...form,
@@ -43,60 +46,68 @@ function RegisterPage() {
 		})
 	}
 
-	const handleOnChange = (event) => {
-		console.log(event)
+	const handleOnChange = (event) => 
 		setForm({
 			...form,
 			[event.target.name]: event.target.value
 		})
-	}
-
-	const [isValid, setIsValid] = useState(false);
+	
 
 	function validateForm(newPatient) {
-		if (newPatient.nome !== "") {
-			setIsValid(true);
-		} else {
-			setIsValid(false);
-			console.log("NOME VAZIO");
-		}
-
-		if (newPatient.email !== "") {
-			setIsValid(true);
-		}
-
+		
 		if (
 			newPatient.cpf !== "" ||
 			newPatient.cpf.length === 11 ||
 			newPatient.cpf !== dataPatients.map((patient) => patient.cpf)
 		) {
-			setIsValid(true);
+			// setIsValid(true);
 		}
 
-		if (newPatient.telefone !== "") {
-			setIsValid(true);
+		
+	}
+
+	const isFormValid = () => {
+		let result = true;
+		let validationMessages = {}
+		//Check if any input is empty
+		Object.keys(form).map((attributeName) => {
+			if(form[attributeName] === ""){
+				result = false;
+				validationMessages[attributeName] = "Esse campo é obrigatório!";
+			}
+		});
+
+		//check if is a valid cpf
+		if(form.cpf.length !== 11){
+			validationMessages.cpf = "Esse CPF é inválido!";
+			result = false;
 		}
 
-		if (newPatient.dataDeNascimento === "") {
-			setIsValid(true);
+		//Check if CPF already exists
+		if(dataPatients.find((patient) => patient.cpf === form.cpf)){
+			validationMessages.cpf = "Esse CPF já foi cadastrado para outro usuário!";
+			result = false;
 		}
 
-		if (newPatient.cidade === "") {
-			setIsValid(true);
-		}
+		setFormValidation(validationMessages)
+		return result;
+	}
 
-		if (isValid) {
+	function handleSubmitForm() {
+		
+		if(isFormValid()){
+
 			const newData = [...dataPatients, ...[
 				{
-					...newPatient,
+					...form,
 					id: dataPatients.length + 1
 				}
 			]];
+			
 			localStorage.setItem("patients", JSON.stringify(newData));
 			setDataPatients(newData);
-		}
+			setForm(formStateEmpty);
 
-		if (isValid) {
 			Swal.fire({
 				title: "Paciente Cadastrado com Sucesso!",
 				icon: "success",
@@ -104,14 +115,8 @@ function RegisterPage() {
 				confirmButtonColor: "#2D9CDB",
 			});
 
-			setForm(formStateEmpty);
-
 		}
-	}
-
-	function handleSubmitForm() {
-
-		validateForm(form);
+		
 	}
 
 	return (
@@ -133,9 +138,7 @@ function RegisterPage() {
 									onChange={handleOnChange}
 									value={form.name}
 								/>
-								{/* {name === "" ? (
-									<p>{`* Por favor informe um nome`}</p>
-								) : null} */}
+								<FormErrorMessage errors={formValidation} fieldName='name' />
 							</Box>
 							<Box className="box-form">
 								<FormLabel htmlFor="email">E-mail</FormLabel>
@@ -147,6 +150,7 @@ function RegisterPage() {
 									onChange={handleOnChange}
 									value={form.email}
 								/>
+								<FormErrorMessage errors={formValidation} fieldName='email' />
 							</Box>
 						</HStack>
 
@@ -156,12 +160,13 @@ function RegisterPage() {
 									Data de Nascimento
 								</FormLabel>
 								<Input
-									name="nasc"
+									name="birthDate"
 									variant="filled"
 									type="date"
 									onChange={handleOnChange}
 									value={form.birthDate}
 								/>
+								<FormErrorMessage errors={formValidation} fieldName='birthDate' />
 							</Box>
 							<Box className="box-form">
 								<FormLabel htmlFor="cpf">CPF</FormLabel>
@@ -173,6 +178,7 @@ function RegisterPage() {
 									onChange={handleOnChange}
 									value={form.cpf}
 								/>
+								<FormErrorMessage errors={formValidation} fieldName='cpf' />
 							</Box>
 						</HStack>
 
@@ -188,6 +194,7 @@ function RegisterPage() {
 									onChange={handleOnChange}
 									value={form.address}
 								/>
+								<FormErrorMessage errors={formValidation} fieldName='address' />
 							</Box>
 							<Box className="box-form">
 								<FormLabel htmlFor="city">Cidade</FormLabel>
@@ -198,6 +205,7 @@ function RegisterPage() {
 									onChange={handleOnChange}
 									value={form.city}
 								/>
+								<FormErrorMessage errors={formValidation} fieldName='city' />
 							</Box>
 						</HStack>
 
@@ -212,6 +220,7 @@ function RegisterPage() {
 									onChange={handleOnChange}
 									value={form.phone}
 								/>
+								<FormErrorMessage errors={formValidation} fieldName='phone' />
 							</Box>
 							<Box className="box-form">
 								<FormLabel>Sexo</FormLabel>
@@ -231,6 +240,7 @@ function RegisterPage() {
 							<Box className="box-form">
 								<FormLabel htmlFor="status">Status</FormLabel>
 								<Select
+									name="status"
 									variant="flushed"
 									onChange={handleOnChange}
 									value={form.status}
